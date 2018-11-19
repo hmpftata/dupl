@@ -1,5 +1,4 @@
 import re
-import scraper as sc
 import urllib.request
 from bs4 import BeautifulSoup
 from operator import itemgetter

@@ -1,5 +1,5 @@
 import re
-import scraper as sc
+import selenium as se
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -9,9 +9,11 @@ from selenium.common import exceptions as SEX
 
 #########################################################################
 def _find_clubs(url, button_text):
-    driver = webdriver.Chrome()
 
-    driver.minimize_window()
+    options = se.webdriver.ChromeOptions()
+    options.add_argument('headless')
+    
+    driver = se.webdriver.Chrome(chrome_options=options)
     driver.get(url)
 
     try:
@@ -25,7 +27,7 @@ def _find_clubs(url, button_text):
     elem.click()
     
     clubs_dict = _parse_markup_for_clubs(driver.page_source)
-    driver.close()
+
     driver.quit()
 
     return clubs_dict
@@ -70,4 +72,4 @@ def nuliga_get_clubs(print_clubs_found = False):
     return clubs_found
 
 #########################################################################
-# nuliga_get_clubs(True)
+nuliga_get_clubs(True)
