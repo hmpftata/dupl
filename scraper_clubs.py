@@ -12,7 +12,8 @@ def _find_clubs(url, button_text):
 
     options = se.webdriver.ChromeOptions()
     options.add_argument('headless')
-    
+    options.add_experimental_option('prefs', {'profile.managed_default_content_settings.images': 2})
+
     driver = se.webdriver.Chrome(chrome_options=options)
     driver.get(url)
 
