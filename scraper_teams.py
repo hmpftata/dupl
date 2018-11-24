@@ -1,8 +1,13 @@
 import re
+import timeit
 import urllib.request
 from bs4 import BeautifulSoup
+from cachetools import cached, TTLCache
+
+cache = TTLCache(maxsize=500, ttl=432000)
 
 #########################################################################
+@cached(cache)
 def nuliga_get_teams(club_id, print_teams_found = False):
 
     if not club_id:
@@ -34,4 +39,6 @@ def nuliga_get_teams(club_id, print_teams_found = False):
     return teams_found
 
 #########################################################################
-# nuliga_get_teams(40039, True)
+#print(timeit.timeit(lambda: nuliga_get_teams(40039, False), number=1))
+#print(timeit.timeit(lambda: nuliga_get_teams(40039, False), number=1))
+#print(timeit.timeit(lambda: nuliga_get_teams(40039, True), number=1))
