@@ -6,6 +6,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as SEX
+from cachetools import cached, TTLCache
+
+cache = TTLCache(maxsize=1, ttl=432000)
 
 #########################################################################
 def _find_clubs(url, button_text):
@@ -54,6 +57,7 @@ def _parse_markup_for_clubs(markup):
     return clubs_found
 
 #########################################################################
+@cached(cache)
 def nuliga_get_clubs(print_clubs_found = False):
 
     url = "https://www.ooetv.at/liga/vereine.html"
@@ -72,5 +76,5 @@ def nuliga_get_clubs(print_clubs_found = False):
 
     return clubs_found
 
-#########################################################################
+##################################################cache = TTLCache(maxsize=100, ttl=300)#######################
 nuliga_get_clubs(True)
