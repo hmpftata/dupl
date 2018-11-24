@@ -1,5 +1,6 @@
 import re
 import timeit
+import urllib
 import selenium as se
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -59,9 +60,15 @@ def _parse_markup_for_clubs(markup):
 
 #########################################################################
 @cached(cache)
-def nuliga_get_clubs(print_clubs_found = False):
+def nuliga_get_clubs(region_url, print_clubs_found = False):
 
-    url = "https://www.ooetv.at/liga/vereine.html"
+    if not region_url:
+        raise ValueError('Parameter region_url must not be empty.')
+    if not isinstance(region_url, str):
+        raise ValueError('Parameter region_url must be from type string.')
+
+    url = urllib.parse.urljoin(region_url, 'liga/vereine.html')
+    print(url)
 
     clubs_found = []
     pageNumberList = [1,2,3,4,5,6,7,8,9,10]
@@ -78,5 +85,6 @@ def nuliga_get_clubs(print_clubs_found = False):
     return clubs_found
 
 #########################################################################
-# print(timeit.timeit(lambda: nuliga_get_clubs(False), number=1))
-# print(timeit.timeit(lambda: nuliga_get_clubs(False), number=1))
+# print(timeit.timeit(lambda: nuliga_get_clubs('https://www.ooetv.at', False), number=1))
+# print(timeit.timeit(lambda: nuliga_get_clubs('https://www.ooetv.at', False), number=1))
+# print(timeit.timeit(lambda: nuliga_get_clubs('https://www.ooetv.at', True), number=1))
