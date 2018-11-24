@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as SEX
 from cachetools import cached, TTLCache
 
-cache = TTLCache(maxsize=10, ttl=432000)
+club_cache = TTLCache(maxsize=10, ttl=432000)
 
 #########################################################################
 def _find_clubs(url, button_text):
@@ -59,7 +59,7 @@ def _parse_markup_for_clubs(markup):
     return clubs_found
 
 #########################################################################
-@cached(cache)
+@cached(club_cache)
 def nuliga_get_clubs(region_url, print_clubs_found = False):
 
     if not region_url:

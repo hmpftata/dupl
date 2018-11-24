@@ -5,10 +5,10 @@ from bs4 import BeautifulSoup
 from operator import itemgetter
 from cachetools import cached, TTLCache
 
-cache = TTLCache(maxsize=500, ttl=80000)
+player_cache = TTLCache(maxsize=500, ttl=80000)
 
 #########################################################################
-@cached(cache)
+@cached(player_cache)
 def nuliga_get_players(team_id, print_players_found = False):
 
     if not team_id:

@@ -4,10 +4,10 @@ import urllib.request
 from bs4 import BeautifulSoup
 from cachetools import cached, TTLCache
 
-cache = TTLCache(maxsize=1, ttl=432000)
+region_cache = TTLCache(maxsize=1, ttl=432000)
 
 #########################################################################
-@cached(cache)
+@cached(region_cache)
 def nuliga_get_regions(print_regions_found = False):
 
     regions_found = []

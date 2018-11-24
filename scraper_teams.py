@@ -4,10 +4,10 @@ import urllib.request
 from bs4 import BeautifulSoup
 from cachetools import cached, TTLCache
 
-cache = TTLCache(maxsize=500, ttl=432000)
+team_cache = TTLCache(maxsize=500, ttl=432000)
 
 #########################################################################
-@cached(cache)
+@cached(team_cache)
 def nuliga_get_teams(club_id, print_teams_found = False):
 
     if not club_id:
