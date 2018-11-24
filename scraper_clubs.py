@@ -1,4 +1,5 @@
 import re
+import timeit
 import selenium as se
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -8,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as SEX
 from cachetools import cached, TTLCache
 
-cache = TTLCache(maxsize=1, ttl=432000)
+cache = TTLCache(maxsize=10, ttl=432000)
 
 #########################################################################
 def _find_clubs(url, button_text):
@@ -76,5 +77,6 @@ def nuliga_get_clubs(print_clubs_found = False):
 
     return clubs_found
 
-##################################################cache = TTLCache(maxsize=100, ttl=300)#######################
-nuliga_get_clubs(True)
+#########################################################################
+# print(timeit.timeit(lambda: nuliga_get_clubs(False), number=1))
+# print(timeit.timeit(lambda: nuliga_get_clubs(False), number=1))
