@@ -8,6 +8,30 @@ from flask import Flask, jsonify, request, abort
 app = Flask(__name__)
 
 ####################################################################################
+@app.route('/dopl/api/v1.0/<region_id>/<int:club_id>/<int:team_id>/players', methods=['GET'])
+def get_teams(region_id=None, club_id=0, team_id=0):
+
+####################################################################################
+@app.route('/dopl/api/v1.0/<region_id>/<int:club_id>/teams', methods=['GET'])
+def get_teams(region_id=None, club_id=0):
+
+    if region_id is None:
+        abort(400) 
+
+    if len(region_id) > 8:
+        abort(400)
+
+    if not re.match('^[A-Z]*$', region_id):
+        abort(400)
+    
+    region_url = scraper_regions.nuliga_get_region_url(region_id)
+    
+    if region_url == None:
+        abort(404)
+
+
+
+####################################################################################
 @app.route('/dopl/api/v1.0/<region_id>/clubs', methods=['GET'])
 def get_clubs(region_id=None):
 

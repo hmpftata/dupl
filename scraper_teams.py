@@ -8,17 +8,12 @@ team_cache = TTLCache(maxsize=500, ttl=432000)
 
 #########################################################################
 @cached(team_cache)
-def nuliga_get_teams(club_id, print_teams_found = False):
+def nuliga_get_teams(url, club_id, print_teams_found = False):
 
-    if not club_id:
-        raise ValueError("Parameter club_id must not be empty.")
-    if not isinstance(club_id, int):
-        raise ValueError("Parameter club_id must be from type int.")
-
-    url = "https://www.ooetv.at/liga/vereine/verein/mannschaften/v/" + str(club_id) + ".html"
+    team_url = url + "/liga/vereine/verein/mannschaften/v/" + str(club_id) + ".html"
     teams_found = []
 
-    page = urllib.request.urlopen(url)
+    page = urllib.request.urlopen(team_url)
     soup = BeautifulSoup(page.read(), features="html.parser")
 
     team_links = soup.find_all("a", href=re.compile("liga/vereine/verein/mannschaften/mannschaft/m"))
@@ -39,6 +34,6 @@ def nuliga_get_teams(club_id, print_teams_found = False):
     return teams_found
 
 #########################################################################
-#print(timeit.timeit(lambda: nuliga_get_teams(40039, False), number=1))
-#print(timeit.timeit(lambda: nuliga_get_teams(40039, False), number=1))
-#print(timeit.timeit(lambda: nuliga_get_teams(40039, True), number=1))
+# print(timeit.timeit(lambda: nuliga_get_teams('https://www.ooetv.at', 40039, False), number=1))
+# print(timeit.timeit(lambda: nuliga_get_teams('https://www.ooetv.at', 40039, False), number=1))
+print(timeit.timeit(lambda: nuliga_get_teams('https://www.ooetv.at', 40039, True), number=1))
