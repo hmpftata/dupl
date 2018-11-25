@@ -36,4 +36,6 @@ def nuliga_get_teams(url, club_id, print_teams_found = False):
 #########################################################################
 # print(timeit.timeit(lambda: nuliga_get_teams('https://www.ooetv.at', 40039, False), number=1))
 # print(timeit.timeit(lambda: nuliga_get_teams('https://www.ooetv.at', 40039, False), number=1))
-print(timeit.timeit(lambda: nuliga_get_teams('https://www.ooetv.at', 40039, True), number=1))
+# print(timeit.timeit(lambda: nuliga_get_teams('https://www.ooetv.at', 40039, True), number=1))
+
+# print(timeit.timeit(lambda: nuliga_get_teams('https://tennis.wien', 10002, True), number=1))

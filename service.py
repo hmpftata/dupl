@@ -1,19 +1,17 @@
 #!flask/bin/python
 
+import re
 import scraper_clubs
 import scraper_regions
-import re
+import scraper_teams
+import scraper_players
 from flask import Flask, jsonify, request, abort
 
 app = Flask(__name__)
 
 ####################################################################################
-@app.route('/dopl/api/v1.0/<region_id>/<int:club_id>/<int:team_id>/players', methods=['GET'])
-def get_teams(region_id=None, club_id=0, team_id=0):
-
-####################################################################################
-@app.route('/dopl/api/v1.0/<region_id>/<int:club_id>/teams', methods=['GET'])
-def get_teams(region_id=None, club_id=0):
+@app.route('/dopl/api/v1.0/<region_id>/<int:club_id>/<int:team_id>', methods=['GET'])
+def get_players(region_id=None, club_id=0, team_id=0):
 
     if region_id is None:
         abort(400) 
@@ -30,9 +28,33 @@ def get_teams(region_id=None, club_id=0):
         abort(404)
 
 
+####################################################################################
+@app.route('/dopl/api/v1.0/<region_id>/<int:club_id>', methods=['GET'])
+def get_teams(region_id=None, club_id=0):
+
+    if region_id is None:
+        abort(400) 
+
+    if len(region_id) > 8:
+        abort(400)
+
+    if not re.match('^[A-Z]*$', region_id):
+        abort(400)
+    
+    region_url = scraper_regions.nuliga_get_region_url(region_id)
+    
+    if region_url == None:
+        abort(404)
+
+    teams = scraper_teams.nuliga_get_teams(region_url, club_id)
+    
+    if len(teams) == 0:
+        abort(404)
+
+    return jsonify({'teams': teams})
 
 ####################################################################################
-@app.route('/dopl/api/v1.0/<region_id>/clubs', methods=['GET'])
+@app.route('/dopl/api/v1.0/<region_id>', methods=['GET'])
 def get_clubs(region_id=None):
 
     if region_id == None:
