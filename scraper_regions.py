@@ -40,14 +40,14 @@ def nuliga_get_regions(print_regions_found = False):
 
 #########################################################################
 def nuliga_get_region(region_id): 
-    return next((region for region in nuliga_get_regions() if region["id"] == region_id), False)
+    return next((region for region in nuliga_get_regions() if region["id"] == region_id), None)
 
 #########################################################################
 def nuliga_get_region_url(region_id):
     region = nuliga_get_region(region_id)
 
-    if not region:
-        return ''
+    if region is None:
+        return None
 
     return region['url']
 
@@ -56,5 +56,5 @@ def nuliga_get_region_url(region_id):
 # print(timeit.timeit(lambda: nuliga_get_regions(False), number=1))
 # print(timeit.timeit(lambda: nuliga_get_regions(True), number=1))
 
-print(nuliga_get_region('OÖTV'))
-print(nuliga_get_region_url('OÖTV'))
+# print(nuliga_get_region('OÖTV'))
+# print(nuliga_get_region_url('OÖTV'))

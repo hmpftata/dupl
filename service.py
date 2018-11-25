@@ -9,8 +9,11 @@ app = Flask(__name__)
 
 ####################################################################################
 @app.route('/dopl/api/v1.0/<region_id>/clubs', methods=['GET'])
-def get_clubs(region_id='OÖTV'):
-    
+def get_clubs(region_id=None):
+
+    if region_id == None:
+        abort(400) 
+
     if len(region_id) > 8:
         abort(400)
 
@@ -18,6 +21,10 @@ def get_clubs(region_id='OÖTV'):
         abort(400)
 
     region_url = scraper_regions.nuliga_get_region_url(region_id)
+
+    if region_url == None:
+        abort(404)
+
     clubs = scraper_clubs.nuliga_get_clubs(region_url)
     
     if len(clubs) == 0:
