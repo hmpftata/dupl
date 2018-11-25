@@ -1,5 +1,6 @@
 import re
 import timeit
+import scraper_regions
 import urllib.request
 from bs4 import BeautifulSoup
 from operator import itemgetter
@@ -9,14 +10,13 @@ player_cache = TTLCache(maxsize=500, ttl=80000)
 
 #########################################################################
 @cached(player_cache)
-def nuliga_get_players(team_id, print_players_found = False):
+def nuliga_get_players(region_id, club_id, team_id, print_players_found = False):
 
-    if not team_id:
-        raise ValueError('Parameter team_id must not be empty.')
-    if not isinstance(team_id, int):
-        raise ValueError('Parameter team_id must be from type int.')
+    region_url = scraper_regions.nuliga_get_region_url(region_id)
+    if region_id is None:
+        return []
 
-    url = 'https://www.ooetv.at/liga/vereine/verein/mannschaften/mannschaft/m/' + str(team_id) + '.html'
+    url = region_url + '/liga/vereine/verein/mannschaften/mannschaft/m/' + str(team_id) + '.html'
 
     page = urllib.request.urlopen(url)
     soup = BeautifulSoup(page.read(), features='html.parser')

@@ -21,12 +21,13 @@ def get_players(region_id=None, club_id=0, team_id=0):
 
     if not re.match('^[A-Z]*$', region_id):
         abort(400)
-    
-    region_url = scraper_regions.nuliga_get_region_url(region_id)
-    
-    if region_url == None:
+
+    players = scraper_players.nuliga_get_players(region_id, club_id, team_id)    
+
+    if len(players) == 0:
         abort(404)
 
+    return jsonify({'players': players})
 
 ####################################################################################
 @app.route('/dopl/api/v1.0/<region_id>/<int:club_id>', methods=['GET'])
@@ -41,12 +42,7 @@ def get_teams(region_id=None, club_id=0):
     if not re.match('^[A-Z]*$', region_id):
         abort(400)
     
-    region_url = scraper_regions.nuliga_get_region_url(region_id)
-    
-    if region_url == None:
-        abort(404)
-
-    teams = scraper_teams.nuliga_get_teams(region_url, club_id)
+    teams = scraper_teams.nuliga_get_teams(region_id, club_id)
     
     if len(teams) == 0:
         abort(404)
@@ -66,12 +62,7 @@ def get_clubs(region_id=None):
     if not re.match('^[A-Z]*$', region_id):
         abort(400)
 
-    region_url = scraper_regions.nuliga_get_region_url(region_id)
-
-    if region_url == None:
-        abort(404)
-
-    clubs = scraper_clubs.nuliga_get_clubs(region_url)
+    clubs = scraper_clubs.nuliga_get_clubs(region_id)
     
     if len(clubs) == 0:
         abort(404)

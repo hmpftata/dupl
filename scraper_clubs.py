@@ -2,6 +2,7 @@ import re
 import timeit
 import urllib.request
 import traceback
+import scraper_regions
 import selenium as se
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -57,24 +58,21 @@ def _parse_markup_for_clubs(markup, clubs_found):
 
 #########################################################################
 @cached(club_cache)
-def nuliga_get_clubs(region_url, print_clubs_found = False):
+def nuliga_get_clubs(region_id, print_clubs_found = False):
 
-    if not region_url:
-        raise ValueError('Parameter region_url must not be empty.')
-    if not isinstance(region_url, str):
-        raise ValueError('Parameter region_url must be from type string.')
-
-    url = urllib.parse.urljoin(region_url, 'liga/vereine.html')
-    print(url)
+    region_url = scraper_regions.nuliga_get_region_url(region_id)
+    if region_id is None:
+        return []
 
     clubs_found = []
-    pageNumberList = [2,3,4,5,6,7,8,9,10]
+    page_numbers = [2,3,4,5,6,7,8,9,10]
+    url = urllib.parse.urljoin(region_url, 'liga/vereine.html')
 
     _find_clubs_on_first_page(url, clubs_found)
 
-    for pageNumber in pageNumberList:
+    for page_number in page_numbers:
         try:
-            _find_clubs(url, str(pageNumber), clubs_found)
+            _find_clubs(url, str(page_number), clubs_found)
         except Exception:
             traceback.print_exc()
             break
@@ -85,6 +83,6 @@ def nuliga_get_clubs(region_url, print_clubs_found = False):
     return clubs_found
 
 #########################################################################
-# print(timeit.timeit(lambda: nuliga_get_clubs('https://www.ooetv.at', False), number=1))
-# print(timeit.timeit(lambda: nuliga_get_clubs('https://www.ooetv.at', False), number=1))
-# print(timeit.timeit(lambda: nuliga_get_clubs('https://www.ooetv.at', True), number=1))
+# print(timeit.timeit(lambda: nuliga_get_clubs('OOETV', False), number=1))
+# print(timeit.timeit(lambda: nuliga_get_clubs('OOETV', False), number=1))
+# print(timeit.timeit(lambda: nuliga_get_clubs('OOETV', True), number=1))

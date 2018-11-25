@@ -1,5 +1,6 @@
 import re
 import timeit
+import scraper_regions
 import urllib.request
 from bs4 import BeautifulSoup
 from cachetools import cached, TTLCache
@@ -8,9 +9,13 @@ team_cache = TTLCache(maxsize=500, ttl=432000)
 
 #########################################################################
 @cached(team_cache)
-def nuliga_get_teams(url, club_id, print_teams_found = False):
+def nuliga_get_teams(region_id, club_id, print_teams_found = False):
 
-    team_url = url + "/liga/vereine/verein/mannschaften/v/" + str(club_id) + ".html"
+    region_url = scraper_regions.nuliga_get_region_url(region_id)
+    if region_id is None:
+        return []
+
+    team_url = region_url + "/liga/vereine/verein/mannschaften/v/" + str(club_id) + ".html"
     teams_found = []
 
     page = urllib.request.urlopen(team_url)
