@@ -1,6 +1,7 @@
 import re
 import timeit
-import urllib
+import urllib.request
+import traceback
 import selenium as se
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -13,7 +14,7 @@ from cachetools import cached, TTLCache
 club_cache = TTLCache(maxsize=10, ttl=432000)
 
 #########################################################################
-def _find_clubs(url, button_text):
+def _find_clubs(url, button_text, clubs_found):
 
     options = se.webdriver.ChromeOptions()
     options.add_argument('headless')
@@ -26,37 +27,33 @@ def _find_clubs(url, button_text):
         elem = driver.find_element_by_link_text(button_text)
     except SEX.NoSuchElementException:
         driver.close()
-        driver.quit()
-        raise ValueError("Element ", button_text, " not found.")
-        return
+        raise ValueError('Button not found')
 
     elem.click()
-    
-    clubs_dict = _parse_markup_for_clubs(driver.page_source)
+    clubs_dict = _parse_markup_for_clubs(driver.page_source, clubs_found)
 
     driver.quit()
 
-    return clubs_dict
+#########################################################################
+def _find_clubs_on_first_page(url, clubs_found):
+    page = urllib.request.urlopen(url)
+    return _parse_markup_for_clubs(page.read(), clubs_found)
 
 #########################################################################
-def _parse_markup_for_clubs(markup):
+def _parse_markup_for_clubs(markup, clubs_found):
     soup = BeautifulSoup(markup, features="html.parser")
 
     clubsLinks = soup.find_all("a", href=re.compile("vereine/verein/v"))
-
-    clubs_found = []
 
     for clubLink in clubsLinks:
         url = clubLink.get("href")
         match = re.search("/v/(.+?)\.html", url)
         clubs_found.append(
-            { 
+            {
                 'id': int(match.group(1)),
                 'name': clubLink.string.strip()
             }
         )
-
-    return clubs_found
 
 #########################################################################
 @cached(club_cache)
@@ -71,12 +68,15 @@ def nuliga_get_clubs(region_url, print_clubs_found = False):
     print(url)
 
     clubs_found = []
-    pageNumberList = [1,2,3,4,5,6,7,8,9,10]
+    pageNumberList = [2,3,4,5,6,7,8,9,10]
+
+    _find_clubs_on_first_page(url, clubs_found)
 
     for pageNumber in pageNumberList:
         try:
-            clubs_found.append(_find_clubs(url, str(pageNumber)))
-        except:
+            _find_clubs(url, str(pageNumber), clubs_found)
+        except Exception:
+            traceback.print_exc()
             break
 
     if print_clubs_found:
