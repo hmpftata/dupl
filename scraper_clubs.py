@@ -75,7 +75,6 @@ def nuliga_get_clubs(region_id, print_clubs_found = False):
         try:
             _find_clubs(url, str(page_number), clubs_found)
         except Exception:
-            traceback.print_exc()
             break
 
     if print_clubs_found:
