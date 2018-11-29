@@ -6,6 +6,14 @@ docker build . -t dupl-service:v1
 # Run the docker container
 docker run --rm -p 5000:5000 dupl-service:v1
 
+# Run the docker container behind a proxy
+docker run -p 5000:5000 
+                --rm
+                --env HTTP_PROXY="http://172.0.0.1:8080"
+                --env HTTPS_PROXY="http://172.0.0.1:8080"
+                --env FTP_PROXY="http://172.0.0.1:8080"
+            dupl-service:v1
+
 # Run the docker container as deamon
 docker run -d -p 5000:5000 dupl-service:v1
 
