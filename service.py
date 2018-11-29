@@ -75,4 +75,4 @@ def get_regions():
     return jsonify({'regions': scraper_regions.nuliga_get_regions()}), 201
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0')
