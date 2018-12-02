@@ -22,13 +22,16 @@ def region_is_valid(region_id):
         return False
 
 ####################################################################################
-@app.route('/dopl/api/v1.0/<region_id>/<int:club_id>/<int:team_id>', methods=['GET'])
+@app.route('/dopl/api/v1.0/regions/<region_id>/clubs/<int:club_id>/teams/<int:team_id>/players', methods=['GET'])
 def get_players(region_id=None, club_id=0, team_id=0):
 
     if not region_is_valid:
         abort(400) 
 
-    players = scraper_players.nuliga_get_players(region_id, club_id, team_id)    
+    if request.args.get('mock') is None:
+        players = scraper_players.nuliga_get_players(region_id, club_id, team_id)    
+    else:
+        players = [{"itn":5.5,"name":"Walther, Jean-Daniel"},{"itn":6.0,"name":"Wiesm\u00fcller, Manfred"}]
 
     if len(players) == 0:
         abort(404)
@@ -36,13 +39,16 @@ def get_players(region_id=None, club_id=0, team_id=0):
     return jsonify({'players': players})
 
 ####################################################################################
-@app.route('/dopl/api/v1.0/<region_id>/<int:club_id>', methods=['GET'])
+@app.route('/dopl/api/v1.0/regions/<region_id>/clubs/<int:club_id>/teams', methods=['GET'])
 def get_teams(region_id=None, club_id=0):
 
     if not region_is_valid:
         abort(400) 
     
-    teams = scraper_teams.nuliga_get_teams(region_id, club_id)
+    if request.args.get('mock') is None:
+        teams = scraper_teams.nuliga_get_teams(region_id, club_id)
+    else:
+        teams = [{"id":"407938","name":"Herren 45 1 (2er)"},{"id":"407939","name":"Herren 45 2 (2er)"}]
     
     if len(teams) == 0:
         abort(404)
@@ -50,13 +56,16 @@ def get_teams(region_id=None, club_id=0):
     return jsonify({'teams': teams})
 
 ####################################################################################
-@app.route('/dopl/api/v1.0/<region_id>', methods=['GET'])
+@app.route('/dopl/api/v1.0/regions/<region_id>/clubs', methods=['GET'])
 def get_clubs(region_id=None):
 
     if not region_is_valid:
         abort(400) 
 
-    clubs = scraper_clubs.nuliga_get_clubs(region_id)
+    if request.args.get('mock') is None:
+        clubs = scraper_clubs.nuliga_get_clubs(region_id)
+    else:
+        clubs = [{"id":40001,"name":"UTC Aigen"},{"id":40002,"name":"UTC Altenberg"}]
     
     if len(clubs) == 0:
         abort(404)
@@ -66,8 +75,13 @@ def get_clubs(region_id=None):
 ####################################################################################
 @app.route('/dopl/api/v1.0/regions', methods=['GET'])
 def get_regions():
-    return jsonify({'regions': scraper_regions.nuliga_get_regions()}), 201
+
+    if request.args.get('mock') is None:
+        return jsonify({'regions': scraper_regions.nuliga_get_regions()}), 201
+    else:
+        return jsonify('regions', [{"id":"OOETV","url":"https://www.ooetv.at"},{"id":"NOETV","url":"https://www.noetv.at"}])
 
 ####################################################################################
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run()
+    #app.run(host='0.0.0.0')
