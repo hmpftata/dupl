@@ -1,12 +1,11 @@
 FROM joyzoursky/python-chromedriver:latest
 
-RUN pip install --upgrade pip
-RUN pip install selenium
-RUN pip install beautifulsoup4
-RUN pip install cachetools
-RUN pip install flask
-RUN pip install flask_restplus 
-RUN pip install pyopenssl
+RUN pip3 install selenium
+RUN pip3 install beautifulsoup4
+RUN pip3 install cachetools
+RUN pip3 install flask
+RUN pip3 install flask_restplus 
+RUN pip3 install marshmallow
 
 RUN mkdir -p /dupl
 

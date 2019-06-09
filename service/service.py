@@ -5,16 +5,46 @@ import scraper_clubs
 import scraper_regions
 import scraper_teams
 import scraper_players
-from flask import Flask, request, abort
-from flask_restplus import Resource, Api
+from flask import Flask, Blueprint, request, abort
+from flask_restplus import Resource, Api, fields
+from marshmallow import Schema, fields as ma_fields, post_load
+from functools import wraps
 
 app = Flask(__name__)
 
-api = Api(app, version='1.0', title='Austria ITN API',
+authorizations = {
+    'apikey': {
+        'type' : 'apiKey',
+        'in' : 'header',
+        'name' : 'X-API-KEY'
+    }
+}
+
+api = Api(app, authorizations=authorizations, version='1.0', title='Austria ITN API',
     description='An ITN API for austrian tennis players.',
 )
 
 ns = api.namespace('atitn', description='ITN operations')
+
+####################################################################################
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        
+        token = None
+
+        if 'X-API-KEY' in request.headers:
+            token = request.headers['X-API-KEY']
+
+        if not token:
+            return {'message' : 'Token is missing.'}, 401
+
+        if token != 'ststtoken':
+            return {'messaage' : 'Invalid token.'}, 401
+
+        return f(*args, **kwargs)
+
+    return decorated
 
 ####################################################################################
 def region_is_valid(region_id):
@@ -29,15 +59,17 @@ def region_is_valid(region_id):
         return False
 
 ####################################################################################
-@ns.route('/regions/<region_id>/clubs/<int:club_id>/teams/<int:team_id>/players')
-@ns.param('region_id', 'An region ID')
-@ns.param('club_id', 'An club ID')
-@ns.param('team_id', 'An team ID')
+@api.route('/regions/<region_id>/clubs/<int:club_id>/teams/<int:team_id>/players')
+@api.param('region_id', 'The ID of the players region.')
+@api.param('club_id', 'The ID of the players club.')
+@api.param('team_id', 'The ID of the players team.')
 class Players(Resource):
 
-    @ns.response(200, 'Success')
-    @ns.response(400, 'Invalid region_id')
-    @ns.response(404, 'No players found for a specific region, club and team')
+    @api.response(200, 'Success')
+    @api.response(400, 'Invalid region_id')
+    @api.response(404, 'No players found for a specific region, club and team')
+    @api.doc(security='apikey')
+    @token_required
     def get(self, region_id=None, club_id=0, team_id=0):
         """Gets a list of players for a specific region, club and team."""
 
@@ -52,14 +84,16 @@ class Players(Resource):
         return {'players': players}
 
 ####################################################################################
-@ns.route('/regions/<region_id>/clubs/<int:club_id>/teams')
-@ns.param('region_id', 'An region ID')
-@ns.param('club_id', 'An club ID')
+@api.route('/regions/<region_id>/clubs/<int:club_id>/teams')
+@api.param('region_id', 'The ID of the players region.')
+@api.param('club_id', 'The ID of the players club.')
 class Team(Resource):
 
-    @ns.response(200, 'Success')
-    @ns.response(400, 'Invalid region_id')
-    @ns.response(404, 'No teams found for a specific region and club')
+    @api.response(200, 'Success')
+    @api.response(400, 'Invalid region_id')
+    @api.response(404, 'No teams found for a specific region and club')
+    @api.doc(security='apikey')
+    @token_required
     def get(self, region_id=None, club_id=0):
         """Gets a list of teams for a specific club and region."""
 
@@ -74,13 +108,15 @@ class Team(Resource):
         return {'teams': teams}
 
 ####################################################################################
-@ns.route('/regions/<region_id>/clubs')
-@ns.param('region_id', 'An region ID')
+@api.route('/regions/<region_id>/clubs')
+@api.param('region_id', 'The ID of the players region.')
 class Club(Resource):
 
-    @ns.response(200, 'Success')
-    @ns.response(400, 'Invalid region_id')
-    @ns.response(404, 'No clubs found for a specific region')
+    @api.response(200, 'Success')
+    @api.response(400, 'Invalid region_id')
+    @api.response(404, 'No clubs found for a specific region')
+    @api.doc(security='apikey')
+    @token_required
     def get(self, region_id=None):
         """Gets a list of clubs for a specific region."""
 
@@ -95,17 +131,19 @@ class Club(Resource):
         return {'clubs': clubs}
 
 ####################################################################################
-@ns.route('/regions')
+@api.route('/regions')
 class Regions(Resource):
 
-    @ns.response(200, 'Success')
-    @ns.response(201, 'Mock data returned')
+    @api.response(200, 'Success')
+    @api.doc(security='apikey')
+    @token_required
     def get(self):
         """Gets a list of regions available for AT."""
         return {'regions': scraper_regions.nuliga_get_regions()}
         
 ####################################################################################
 if __name__ == '__main__':
+    app.run()
     #app.run(ssl_context='adhoc')
     #app.run(host='0.0.0.0', ssl_context='adhoc')
-    app.run(host='0.0.0.0')
+    #app.run(host='0.0.0.0')
