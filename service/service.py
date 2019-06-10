@@ -9,6 +9,7 @@ from flask import Flask, Blueprint, request, abort
 from flask_restplus import Resource, Api, fields
 from marshmallow import Schema, fields as ma_fields, post_load
 from functools import wraps
+from cachetools import cached, TTLCache
 
 app = Flask(__name__)
 
@@ -26,6 +27,24 @@ api = Api(app, authorizations=authorizations, version='1.0', title='Austria ITN 
 
 ns = api.namespace('atitn', description='ITN operations')
 
+token_cache = TTLCache(maxsize=1, ttl=432000)
+
+####################################################################################
+@cached(token_cache)
+def token_read():
+    
+    token = ''
+    
+    with open('token.txt', 'r') as f:
+        token = f.readline()
+    
+    token = token.rstrip('\n')
+    token = token.strip()
+
+    print('token found: ', token)
+
+    return token
+
 ####################################################################################
 def token_required(f):
     @wraps(f)
@@ -39,7 +58,7 @@ def token_required(f):
         if not token:
             return {'message' : 'Token is missing.'}, 401
 
-        if token != 'ststtoken':
+        if token != token_read():
             return {'messaage' : 'Invalid token.'}, 401
 
         return f(*args, **kwargs)
@@ -143,7 +162,7 @@ class Regions(Resource):
         
 ####################################################################################
 if __name__ == '__main__':
-    #app.run()
+    app.run()
     #app.run(ssl_context='adhoc')
     #app.run(host='0.0.0.0', ssl_context='adhoc')
-    app.run(host='0.0.0.0')
+    #app.run(host='0.0.0.0')

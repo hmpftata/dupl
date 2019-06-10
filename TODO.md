@@ -1,3 +1,3 @@
 # dupl
 
-- rest service
+- Token from file mapped to container
