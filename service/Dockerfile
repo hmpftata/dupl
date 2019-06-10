@@ -10,6 +10,6 @@ RUN pip3 install marshmallow
 RUN mkdir -p /dupl
 
 ADD *.py /dupl/
-ADD token.txt /dupl/
+ADD token.txt /
 
 CMD [ "/usr/local/bin/python3.7" ,"/dupl/service.py" ]
